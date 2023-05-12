@@ -75,6 +75,7 @@ public class PlayerScript : MonoBehaviour
     private float _rotationVelocity;
     private float _verticalVelocity;
     private float _terminalVelocity = 53.0f;
+    private Vector3 _localScale;
 
     // timeout deltatime
     private float _jumpTimeoutDelta;
@@ -83,7 +84,7 @@ public class PlayerScript : MonoBehaviour
     private float _threshold = 0.01f;
     private bool _interactableFound;
 
-    private CharacterController _characterController;
+    [HideInInspector] public CharacterController _characterController;
     private InputCapture _inputCatcher;
     private GameObject _mainCamera;
     private Camera _camera;
@@ -130,6 +131,8 @@ public class PlayerScript : MonoBehaviour
         // Reset Timeouts on Start
         _jumpTimeoutDelta = jumpTimeout;
         _fallTimeoutDelta = fallTimeout;
+
+        _localScale = new Vector3(0.5f, 0.5f, 0.5f);
     }
 
     private void Update()
@@ -354,14 +357,9 @@ public class PlayerScript : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, rayCastLayer))
         {
-            Debug.Log(hit.transform.name);
-            hit.transform.TryGetComponent<IInteractable>(out interactable);
-
-            //hit.transform.GetComponent<IInteractable>();
-            if (interactable != null)
+            if (hit.transform.TryGetComponent(out interactable))
             {
                 MessageManager.Instance.hintText.SetActive(true);
-
             }
             else
             {
@@ -372,6 +370,11 @@ public class PlayerScript : MonoBehaviour
             {
                 interactable.Interact(this);
             }
+
+        }
+        else
+        {
+            MessageManager.Instance.hintText.SetActive(false);
         }
 
         _inputCatcher.interact = false;
@@ -392,11 +395,11 @@ public class PlayerScript : MonoBehaviour
             {
                 if (collision.gameObject.CompareTag("MovingPlatform"))
                 {
-                    transform.parent = collision.transform;
+                    transform.SetParent(collision.transform, true);
                 }
                 else
                 {
-                    transform.parent = playerSection.transform;
+                    transform.SetParent(playerSection);
                 }
             }
         }

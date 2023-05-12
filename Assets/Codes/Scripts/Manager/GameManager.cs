@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public GameObject player;
+    public Transform startPoint;
 
     public bool isPaused = false;
     public bool mouseLocked = false;
