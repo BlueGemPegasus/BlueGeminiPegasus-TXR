@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -34,6 +35,10 @@ public class PlayerScript : MonoBehaviour
     public float groundCheckRadius = -0.14f;
     [Tooltip("Which layer does the ground check")]
     public LayerMask groundLayers;
+
+    [Header("Custom Groundcheck Details")]
+    [Tooltip("The parent that it need to move mack to")]
+    public Transform playerSection;
 
     [Header("Raycast")]
     //[Tooltip("The range that the raycast can reach")]
@@ -138,6 +143,7 @@ public class PlayerScript : MonoBehaviour
             CameraRotation();
         }
 
+        MovingPlatformCheck();
         GroundedCheck();
     }
 
@@ -367,11 +373,37 @@ public class PlayerScript : MonoBehaviour
                 interactable.Interact(this);
             }
         }
-        
-        
-            
 
         _inputCatcher.interact = false;
+
+    }
+
+    private void MovingPlatformCheck()
+    {
+        // Set ground check sphere position, with offset
+        Vector3 groundCheckSpherePosition = new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z);
+        Collider[] platformDetector = Physics.OverlapSphere(groundCheckSpherePosition, groundCheckRadius, groundLayers, QueryTriggerInteraction.Ignore);
+        // If on ground, check the gameObject is Moving Platform or not
+        // If yes, change parent to MovingPlatform
+        // If no, change parent to playerSection
+        if (platformDetector.Length > 0)
+        {
+            foreach (Collider collision in platformDetector)
+            {
+                if (collision.gameObject.CompareTag("MovingPlatform"))
+                {
+                    transform.parent = collision.transform;
+                }
+                else
+                {
+                    transform.parent = playerSection.transform;
+                }
+            }
+        }
+        else
+        {
+            transform.parent = playerSection.transform;
+        }
 
     }
 
