@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7db7cf63b1460c74087ca39eaef09dab, type: 3}
+  m_Name: WhatIsThisProjectFor
+  m_EditorClassIdentifier: 
+  narratives:
+  - message: 'This project is a test given by TrueXR.
+
+      Purpose of this project
+      was to strike an interview with TrueXR.'
+    choices: []
+  - message: Do you have any question to ask?
+    choices:
+    - choicesText: Yes
+      messageAfterChoice: {fileID: 11400000, guid: a5bdfa25f4e63d24bb9894519231fdf0, type: 2}
+    - choicesText: No
+      messageAfterChoice: {fileID: 0}

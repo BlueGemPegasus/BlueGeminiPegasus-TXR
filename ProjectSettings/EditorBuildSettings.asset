@@ -7,3 +7,4 @@ EditorBuildSettings:
   m_Scenes: []
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 2ba3a2b91724b64478393ac55f10d3cc, type: 2}
+    com.unity.input.settings: {fileID: 11400000, guid: 3471da53277943f4aa1aa0301a41c88c, type: 2}
