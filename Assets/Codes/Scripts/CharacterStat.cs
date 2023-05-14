@@ -19,7 +19,8 @@ public class CharacterStat : MonoBehaviour
         
         if (currentHealth <= 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
+            //Destroy(gameObject);
         }
     }
 

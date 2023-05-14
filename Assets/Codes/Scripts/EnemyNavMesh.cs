@@ -34,31 +34,31 @@ public class EnemyNavMesh : MonoBehaviour
 
     private void Update()
     {
-        //check for sight and attack range
-        //playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
-        //playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
+        if (gameObject.activeSelf)
+        {
+            //check for sight and attack range
+            playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
+            playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        RaycastDetector();
+            RaycastDetector();
 
-        if (!playerInSightRange && !playerInAttackRange) Patroling();
-        else if (playerInSightRange && !playerInAttackRange) ChasePlayer();
-        else if (playerInAttackRange && playerInSightRange) AttackPlayer();
+            if (!playerInSightRange && !playerInAttackRange) Patroling();
+            else if (playerInSightRange && !playerInAttackRange) ChasePlayer();
+            else if (playerInAttackRange && playerInSightRange) AttackPlayer();
+        }
     }
 
     private void RaycastDetector()
     {
         RaycastHit hit;
 
-        if (Physics.Raycast(transform.position, transform.forward,out hit, 5f, whatIsPlayer, QueryTriggerInteraction.Ignore))
+        // If hit wall, search new point
+        if (Physics.Raycast(transform.position, transform.forward, out hit, sightRange))
         {
-            if(hit.transform.CompareTag("Player"))
+            if(hit.transform.gameObject.CompareTag("Wall"))
             {
-                playerInSightRange = true;            
+                SearchWalkPoint();
             }
-        }
-        else
-        {
-            playerInSightRange = false;
         }
     }
 
@@ -66,6 +66,8 @@ public class EnemyNavMesh : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 5f);
+
+        Gizmos.DrawWireSphere(transform.position, sightRange);
     }
 
 
@@ -98,10 +100,11 @@ public class EnemyNavMesh : MonoBehaviour
             _walkPointSetted = true;
 
     }
+
     private void ChasePlayer()
     {
         transform.LookAt(_player);
-        if (Vector3.Distance(transform.position, _player.position) <= 5)
+        if (Vector3.Distance(transform.position, _player.position) <= sightRange)
         {
             _agent.SetDestination(_player.position);
         }
@@ -114,7 +117,7 @@ public class EnemyNavMesh : MonoBehaviour
     private void AttackPlayer()
     {
         transform.LookAt(_player);
-        if (Vector3.Distance(transform.position, _player.position) <= 3)
+        if (Vector3.Distance(transform.position, _player.position) <= attackRange)
         {
             _agent.isStopped = true;
             playerInAttackRange = true;
@@ -130,7 +133,7 @@ public class EnemyNavMesh : MonoBehaviour
         {
             //attack code here
             Rigidbody bullet = Instantiate(bulletPrefab, bulletSpawnpoint.position, Quaternion.identity).GetComponent<Rigidbody>();
-            bullet.velocity = transform.forward * 20f;
+            bullet.velocity = transform.forward * 50f;
 
             _attackOnCooldown = true;
             Invoke(nameof(ResetAttack), attackCooldown);

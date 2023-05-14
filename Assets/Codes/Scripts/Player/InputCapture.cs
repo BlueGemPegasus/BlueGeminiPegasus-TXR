@@ -14,6 +14,7 @@ public class InputCapture : MonoBehaviour
     public bool inventory;
     public bool interact;
     public bool mouse;
+    public bool shoot;
 
     [Header("Mouse Input values")]
     public Vector2 look;
@@ -76,6 +77,11 @@ public class InputCapture : MonoBehaviour
         //MouseInput(value.isPressed);
     }
 
+    public void OnShoot(InputValue value)
+    {
+        ShootInput(value.isPressed);
+    }
+
 #endif
     #endregion
 
@@ -117,6 +123,11 @@ public class InputCapture : MonoBehaviour
     {
         cursorLocked = !newMouseState;
         SetCursorState(cursorLocked);
+    }
+
+    public void ShootInput(bool newShootState)
+    {
+        shoot = newShootState;
     }
 
     private void SetCursorState(bool newState)

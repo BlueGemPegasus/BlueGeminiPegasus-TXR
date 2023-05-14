@@ -52,6 +52,11 @@ public class PlayerScript : MonoBehaviour
     //[Tooltip("This control the detection radius, the detector is a sphere")]
     //public float detectorRadius = 0.5f;
 
+    [Header("Bullet")]
+    public GameObject bulletPrefab;
+    public Transform bulletSpawnpoint;
+    public LayerMask whatIsEnemy;
+
     [Header(" Cinemachine")]
     [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
     public GameObject cinemachineCameraTarget;
@@ -142,11 +147,11 @@ public class PlayerScript : MonoBehaviour
         {
             JumpAndGravity();
             Move();
+            Shoot();
             RaycastTarget();
             CameraRotation();
         }
 
-        MovingPlatformCheck();
         GroundedCheck();
     }
 
@@ -381,33 +386,27 @@ public class PlayerScript : MonoBehaviour
 
     }
 
-    private void MovingPlatformCheck()
-    {
-        // Set ground check sphere position, with offset
-        Vector3 groundCheckSpherePosition = new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z);
-        Collider[] platformDetector = Physics.OverlapSphere(groundCheckSpherePosition, groundCheckRadius, groundLayers, QueryTriggerInteraction.Ignore);
-        // If on ground, check the gameObject is Moving Platform or not
-        // If yes, change parent to MovingPlatform
-        // If no, change parent to playerSection
-        if (platformDetector.Length > 0)
-        {
-            foreach (Collider collision in platformDetector)
-            {
-                if (collision.gameObject.CompareTag("MovingPlatform"))
-                {
-                    transform.SetParent(collision.transform, true);
-                }
-                else
-                {
-                    transform.SetParent(playerSection);
-                }
-            }
-        }
-        else
-        {
-            transform.parent = playerSection.transform;
-        }
 
+    private void Shoot()
+    {
+        if (_inputCatcher.shoot)
+        {
+            // If player shoot, player will look at the white dots
+            Vector3 point = new Vector3(_camera.pixelWidth / 2, _camera.pixelHeight / 2, 0);
+            Ray ray = _camera.ScreenPointToRay(point);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, whatIsEnemy))
+            {
+                transform.LookAt(hit.point);
+            }
+
+            // Set the bullet ly from player to the raycast hit point
+            Vector3 direction = (hit.point - bulletSpawnpoint.position).normalized;
+            Rigidbody bullet = Instantiate(bulletPrefab, bulletSpawnpoint.position, Quaternion.identity).GetComponent<Rigidbody>();
+            bullet.velocity = direction * 50f;
+            _inputCatcher.shoot = false;
+        }
     }
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
